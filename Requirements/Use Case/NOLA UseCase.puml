@@ -1,0 +1,64 @@
+
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor User
+actor "Notification System" as NS
+
+rectangle "MicroMeet System" {
+
+  (View Meetups) as UC1
+  (View Meetup Details) as UC2
+  (Create Meetup) as UC3
+  (Join Meetup) as UC4
+  (Receive Notifications) as UC5
+
+  User --> UC1
+  User --> UC2
+  User --> UC3
+  User --> UC4
+
+  NS --> UC5
+
+  UC3 .> UC5 : <<include>>
+}
+
+note right of User
+The User is the primary actor who interacts with MicroMeet to discover
+micro meetups, view details, create meetups, and join activities based on
+shared interests and real-time availability.
+end note
+
+note right of NS
+The Notification System is a secondary actor that delivers alerts to users
+when meetups are created or updated, when participation changes, or when
+important meetup events occur.
+end note
+
+note right of UC1
+View Meetups allows the user to browse a list of active and upcoming
+micro meetups available in the system.
+end note
+
+note right of UC2
+View Meetup Details allows the user to open a specific meetup and see its
+activity, time, location, host, and current participant information.
+end note
+
+note right of UC3
+Create Meetup allows the user to create a new micro meetup by providing
+activity type, time, location, and capacity, which may trigger notifications.
+end note
+
+note right of UC4
+Join Meetup allows the user to join or request to join a meetup, updating
+their participation status for that meetup.
+end note
+
+note right of UC5
+Receive Notifications represents the system behavior of sending updates to
+users when meetups change or when participation-related events occur.
+end note
+
+@enduml
