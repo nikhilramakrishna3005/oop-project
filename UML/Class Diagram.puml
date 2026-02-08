@@ -1,0 +1,48 @@
+@startuml
+title MicroMeet - Class Diagram
+skinparam classAttributeIconSize 0
+
+class User {
+  id: String
+  name: String
+  preferences: Set
+  availability: Status
+}
+
+class Meetup {
+  id: String
+  title: String
+  time: DateTime
+  capacity: int
+}
+
+class Participation {
+  userId: String
+  status: Status
+}
+
+class Location {
+  label: String
+  latitude: double
+  longitude: double
+}
+
+class MeetupService {
+  createMeetup()
+  updateParticipation()
+}
+
+interface MeetupRepository {
+  loadMeetup()
+  saveMeetup()
+}
+
+class LocalMeetupRepository
+
+User "1" <-- "0..*" Meetup
+Meetup "1" *-- Location
+Meetup "1" *-- Participation
+MeetupService ..> MeetupRepository
+LocalMeetupRepository ..|> MeetupRepository
+
+@enduml

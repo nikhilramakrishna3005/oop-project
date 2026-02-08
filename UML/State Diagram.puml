@@ -1,0 +1,19 @@
+@startuml
+title MicroMeet - State Diagram (Participation Status)
+
+state Requested
+state Accepted
+state Declined
+
+[*] --> Requested
+
+Requested --> Accepted : approve()
+Requested --> Declined : decline()
+
+Accepted --> Declined : changeResponse()
+Declined --> Accepted : changeResponse()
+
+Accepted --> [*] : meetupArchived()
+Declined --> [*] : cancelMeetup()
+
+@enduml

@@ -1,0 +1,30 @@
+@startuml
+title MicroMeet - Sequence Diagram (Join / RSVP Update)
+
+actor User
+participant "MeetupDetailView" as View
+participant "MeetupController" as Controller
+participant "MeetupService" as Service
+database "LocalMeetupRepository" as Repo
+
+note top
+Description: Shows system interaction when a user responds to join a meetup.
+end note
+
+User -> View : tapJoinOrRespond(choice)
+View -> Controller : respondToMeetup(meetupId, userId, choice)
+Controller -> Service : updateParticipation(meetupId, userId, choice)
+
+Service -> Repo : loadMeetup(meetupId)
+Repo --> Service : meetup
+
+Service -> Service : updateParticipantStatus()
+
+Service -> Repo : saveMeetup(meetup)
+Repo --> Service : ok
+
+Service --> Controller : updatedMeetup
+Controller --> View : publish(updatedMeetup)
+View --> User : showUpdatedStatus()
+
+@enduml

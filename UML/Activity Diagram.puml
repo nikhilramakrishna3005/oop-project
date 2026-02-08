@@ -1,0 +1,26 @@
+@startuml
+title MicroMeet - Activity Diagram (Join Flow)
+
+start
+
+:Open Meetup Details;
+:Select Join / Respond;
+
+if (Meetup Full?) then (Yes)
+  :Show Error - Meetup Full;
+  stop
+else (No)
+  :Show Accept / Decline Options;
+endif
+
+if (Accept?) then (Yes)
+  :Set Status = ACCEPTED;
+else (No)
+  :Set Status = DECLINED;
+endif
+
+:Save Participation;
+:Update Participant List;
+
+stop
+@enduml

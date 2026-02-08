@@ -1,0 +1,26 @@
+@startuml
+title MicroMeet - Communication Diagram
+
+object "MeetupDetailView <<boundary>>" as View
+object "MeetupController <<control>>" as C
+object "MeetupService <<control>>" as S
+object "MeetupRepository <<entity>>" as R
+object "Meetup <<entity>>" as M
+object "Participation <<entity>>" as P
+
+View -- C : 1 respond()
+C -- S : 2 updateParticipation()
+S -- R : 3 loadMeetup()
+R -- S : 4 meetup
+S -- M : 5 updateStatus()
+S -- R : 6 saveMeetup()
+S -- C : 7 success
+C -- View : 8 render
+
+M -- P : updates
+
+note bottom
+Description: Shows how objects collaborate.
+end note
+
+@enduml

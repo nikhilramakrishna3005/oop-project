@@ -1,0 +1,76 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor User
+actor Host
+
+package "MicroMeet System" {
+  (View Meetup Details) as UC1
+  (View Active/Upcoming Meetups) as UC2
+  (Respond to Join Request) as UC3
+
+  (Create Meetup) as UC4
+  (Edit Meetup) as UC5
+  (Invite/Approve Participants) as UC6
+  (Send Update Notifications) as UC7
+
+  User --> UC1
+  User --> UC2
+  User --> UC3
+
+  Host --> UC4
+  Host --> UC5
+  Host --> UC6
+
+  UC5 .> UC7 : <<include>>
+}
+
+note bottom
+Description: Shows how Users and Hosts interact with the MicroMeet system
+through use cases such as viewing meetups, responding to join requests,
+and creating or editing meetups.
+end note
+
+note right of User
+Primary actor who discovers meetups, views details,
+and responds to join requests.
+end note
+
+note right of Host
+Secondary actor who creates meetups, edits details,
+and approves participants.
+end note
+
+note right of UC1
+User views detailed information about a selected meetup
+(activity, time, location, host, and participant list).
+end note
+
+note right of UC2
+User browses active and upcoming meetups available in the system.
+end note
+
+note right of UC3
+User responds to a join request by accepting or declining,
+which updates participation status in the meetup.
+end note
+
+note right of UC4
+Host creates a new meetup by providing activity type, time,
+location, capacity, and a short description.
+end note
+
+note right of UC5
+Host updates meetup details such as time, location, or capacity.
+end note
+
+note right of UC6
+Host invites participants or approves join requests to manage attendance.
+end note
+
+note right of UC7
+System sends notifications when meetup details or participation changes.
+end note
+
+@enduml

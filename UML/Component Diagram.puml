@@ -1,0 +1,23 @@
+@startuml
+title MicroMeet - Component Diagram
+skinparam componentStyle rectangle
+
+package "MicroMeet (Java Application)" {
+  [Console UI / Views] as UI
+  [Controllers] as C
+  [Meetup Service\n(Business Logic)] as S
+  [Domain Models\n(User, Meetup, Activity, Location, Participation)] as D
+  [Local Persistence\n(JSON / File Storage)] as P
+}
+
+UI --> C
+C --> S
+S --> D
+S --> P
+P --> D
+
+note top
+Description: Shows high level system architecture.
+end note
+
+@enduml
