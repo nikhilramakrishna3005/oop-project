@@ -1,0 +1,50 @@
+@startuml
+title Robustness - Edit Meetup
+
+left to right direction
+skinparam linetype ortho
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam defaultFontSize 14
+hide members
+
+actor Host
+
+package "Boundary" {
+  boundary EditMeetupView
+}
+
+package "Control" {
+  control MeetupController
+  control MeetupService
+  control NotificationService
+}
+
+package "Entity" {
+  entity MeetupRepository
+  entity Meetup
+  entity Location
+}
+
+Host --> EditMeetupView : 1 changeDetails()
+EditMeetupView --> MeetupController : 2 submitEdits(meetupId, updates)
+MeetupController --> MeetupService : 3 editMeetup(meetupId, updates)
+
+MeetupService --> MeetupRepository : 4 loadMeetup(meetupId)
+MeetupRepository --> MeetupService : 5 meetup
+
+MeetupService --> Meetup : 6 applyUpdates(updates)
+MeetupService --> Location : 7 updateLocationIfNeeded()
+MeetupService --> MeetupRepository : 8 saveMeetup(meetup)
+
+MeetupService --> NotificationService : 9 notifyParticipants(meetupId)
+
+MeetupService --> MeetupController : 10 updatedMeetup
+MeetupController --> EditMeetupView : 11 showUpdatedDetails(updatedMeetup)
+
+note bottom
+Host edits meetup information. The system loads the meetup, applies updates (including location),
+saves changes, and notifies participants about updates.
+end note
+
+@enduml

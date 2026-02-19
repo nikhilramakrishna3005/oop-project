@@ -1,0 +1,51 @@
+@startuml
+title Robustness - Send Update Notifications
+
+left to right direction
+skinparam linetype ortho
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam defaultFontSize 14
+hide members
+
+actor "System Scheduler" as Scheduler
+
+package "Boundary" {
+  boundary SchedulerTrigger
+}
+
+package "Control" {
+  control NotificationController
+  control NotificationService
+}
+
+package "Entity" {
+  entity MeetupRepository
+  entity Meetup
+  entity Participation
+  entity Notification
+  entity "NotificationGateway\n<<external>>" as NotificationGateway
+}
+
+Scheduler --> SchedulerTrigger : 1 triggerJob()
+SchedulerTrigger --> NotificationController : 2 runNotifications()
+NotificationController --> NotificationService : 3 processPendingUpdates()
+
+NotificationService --> MeetupRepository : 4 listMeetupsWithChanges()
+MeetupRepository --> NotificationService : 5 meetups
+
+NotificationService --> Meetup : 6 gatherRecipients()
+NotificationService --> Participation : 7 readParticipants()
+
+NotificationService --> Notification : 8 compose()
+NotificationService --> NotificationGateway : 9 deliver(notification)
+
+NotificationService --> NotificationController : 10 sentCount
+NotificationController --> SchedulerTrigger : 11 logResult(sentCount)
+
+note bottom
+The scheduler triggers notification processing. The service finds meetups with changes,
+collects recipients, composes notifications, and sends them via an external gateway.
+end note
+
+@enduml

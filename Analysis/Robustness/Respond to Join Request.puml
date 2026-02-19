@@ -1,0 +1,51 @@
+@startuml
+title Robustness - Respond to Join Request (Accept/Decline)
+
+left to right direction
+skinparam linetype ortho
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam defaultFontSize 14
+hide members
+
+actor User
+
+package "Boundary" {
+  boundary JoinResponseView
+}
+
+package "Control" {
+  control MeetupController
+  control MeetupService
+  control NotificationService
+}
+
+package "Entity" {
+  entity MeetupRepository
+  entity Meetup
+  entity Participation
+}
+
+User --> JoinResponseView : 1 chooseAcceptOrDecline()
+JoinResponseView --> MeetupController : 2 submitResponse(meetupId, userId, choice)
+MeetupController --> MeetupService : 3 updateParticipation(meetupId,userId,choice)
+
+MeetupService --> MeetupRepository : 4 loadMeetup(meetupId)
+MeetupRepository --> MeetupService : 5 meetup
+
+MeetupService --> Meetup : 6 checkCapacityIfAccept()
+MeetupService --> Participation : 7 setStatus(userId, choice)
+
+MeetupService --> MeetupRepository : 8 saveMeetup(meetup)
+
+MeetupService --> NotificationService : 9 notifyHostOrUser(meetupId,userId,choice)
+
+MeetupService --> MeetupController : 10 updatedMeetup
+MeetupController --> JoinResponseView : 11 showUpdatedStatus(updatedMeetup)
+
+note bottom
+User responds to a join request by accepting or declining. The system loads the meetup,
+checks capacity when accepting, updates participation status, saves changes, and notifies others.
+end note
+
+@enduml

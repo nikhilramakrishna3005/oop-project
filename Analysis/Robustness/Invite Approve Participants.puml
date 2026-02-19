@@ -1,0 +1,53 @@
+@startuml
+title Robustness - Invite / Approve Participants
+
+left to right direction
+skinparam linetype ortho
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam defaultFontSize 14
+hide members
+
+actor Host
+
+package "Boundary" {
+  boundary ManageParticipantsView
+}
+
+package "Control" {
+  control MeetupController
+  control MeetupService
+  control NotificationService
+}
+
+package "Entity" {
+  entity MeetupRepository
+  entity Meetup
+  entity Participation
+  entity User
+}
+
+Host --> ManageParticipantsView : 1 chooseInviteOrApprove()
+ManageParticipantsView --> MeetupController : 2 inviteOrApprove(meetupId,userId,action)
+MeetupController --> MeetupService : 3 manageParticipants(meetupId,userId,action)
+
+MeetupService --> MeetupRepository : 4 loadMeetup(meetupId)
+MeetupRepository --> MeetupService : 5 meetup
+
+MeetupService --> Meetup : 6 checkCapacityIfApprove()
+MeetupService --> User : 7 validateTargetUser(userId)
+MeetupService --> Participation : 8 createOrUpdate(userId, action)
+
+MeetupService --> MeetupRepository : 9 saveMeetup(meetup)
+
+MeetupService --> NotificationService : 10 sendInviteOrApproval(userId, action)
+
+MeetupService --> MeetupController : 11 updatedRoster
+MeetupController --> ManageParticipantsView : 12 showRoster(updatedRoster)
+
+note bottom
+Host manages participants by inviting or approving. The system loads the meetup, validates the user,
+checks capacity for approvals, updates the roster, saves changes, and notifies the participant.
+end note
+
+@enduml
