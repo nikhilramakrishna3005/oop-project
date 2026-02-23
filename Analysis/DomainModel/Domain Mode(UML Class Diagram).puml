@@ -1,0 +1,101 @@
+@startuml
+title MicroMeet - Domain Model (UML Class Diagram)
+
+left to right direction
+skinparam linetype ortho
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+
+' =========================
+' Entity Classes (Domain)
+' =========================
+
+class User {
+  +userId: String
+  +name: String
+  +email: String
+  +availability: AvailabilityStatus
+  +username: String
+  +passwordHash: String
+}
+
+class Preference {
+  +preferenceId: String
+  +activityType: ActivityType
+  +createdAt: DateTime
+}
+
+class Meetup {
+  +meetupId: String
+  +title: String
+  +activityType: ActivityType
+  +time: DateTime
+  +capacity: int
+  +description: String
+}
+
+class Location {
+  +label: String
+  +latitude: double
+  +longitude: double
+}
+
+class Participation {
+  +participationId: String
+  +status: ParticipationStatus
+  +joinedAt: DateTime
+}
+
+class Notification {
+  +notificationId: String
+  +type: String
+  +message: String
+  +createdAt: DateTime
+}
+
+' =========================
+' Enums (Value Types)
+' =========================
+
+enum ActivityType {
+  STUDY
+  GYM
+  FOOD
+  SPORTS
+  COFFEE
+}
+
+enum AvailabilityStatus {
+  ONLINE
+  OFFLINE
+}
+
+enum ParticipationStatus {
+  REQUESTED
+  ACCEPTED
+  DECLINED
+}
+
+' =========================
+' Associations + Multiplicity
+' =========================
+
+' Use cases supported:
+' 1 Authenticate User -> User(username,passwordHash)
+' 2 Manage Profile & Preferences -> User + Preference
+' 3 View Active/Upcoming -> Meetup, Location
+' 4 View Details -> Meetup, Participation, Location
+' 5 Create Meetup -> User hosts Meetup, Meetup at Location
+' 6 Edit Meetup -> Meetup + Location + Notification
+' 7 Invite/Approve -> Participation linked to User and Meetup
+' 8 Respond Join -> Participation status
+' 9 Send Notifications -> Notification linked to Meetup
+
+User "1" -- "0..*" Meetup : hosts >
+Meetup "1" -- "1" Location : at >
+Meetup "1" -- "0..*" Participation : has >
+User "1" -- "0..*" Participation : participant >
+Meetup "1" -- "0..*" Notification : triggers >
+User "1" -- "0..*" Preference : has >
+
+@enduml
