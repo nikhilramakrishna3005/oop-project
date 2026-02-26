@@ -1,0 +1,42 @@
+@startuml
+title MicroMeet - Activity Diagram (Edit Meetup)
+
+start
+:1. Open Edit Meetup screen;
+:2. System loads existing meetup details;
+:3. Host updates fields (time/location/capacity/description);
+:4. Host taps "Save";
+:5. System validates changes;
+
+if (Changes valid?) then (Yes)
+  :6. System loads meetup;
+  :7. System applies updates;
+  :8. System updates location if changed;
+  :9. System saves updated meetup;
+  :10. System notifies participants;
+  :11. Show "Meetup updated" confirmation;
+else (No)
+  :12. Show validation errors;
+  :13. Host revises changes;
+endif
+
+stop
+
+legend bottom
+Steps mapping (numbers match actions):
+1 Open edit meetup screen
+2 Load existing meetup details
+3 Update fields
+4 Tap Save
+5 Validate changes
+6 Load meetup
+7 Apply updates
+8 Update location if changed
+9 Save updated meetup
+10 Notify participants
+11 Show confirmation
+12 Show validation errors
+13 Revise changes
+endlegend
+
+@enduml

@@ -1,0 +1,54 @@
+@startuml
+title MicroMeet - Activity Diagram (Invite / Approve Participants)
+
+start
+:1. Host opens Manage Participants screen;
+:2. Host selects a user and action (Invite/Approve);
+:3. System validates action request;
+
+if (Request valid?) then (Yes)
+  :4. System loads meetup;
+  :5. System validates target user;
+  if (Action = Approve?) then (Yes)
+    :6. System checks capacity;
+    if (Capacity available?) then (Yes)
+      :7. System updates participation status;
+      :8. System saves updated roster;
+      :9. System sends approval notification;
+      :10. Show updated roster;
+    else (No)
+      :11. Show "Meetup full" error;
+    endif
+  else (Invite)
+    :12. System creates invite entry;
+    :13. System saves updated roster;
+    :14. System sends invite notification;
+    :15. Show updated roster;
+  endif
+else (No)
+  :16. Show validation errors;
+endif
+
+stop
+
+legend bottom
+Steps mapping (numbers match actions):
+1 Open manage participants
+2 Select user + action
+3 Validate request
+4 Load meetup
+5 Validate target user
+6 Check capacity (approve)
+7 Update participation status
+8 Save roster
+9 Send approval notification
+10 Show roster
+11 Meetup full error
+12 Create invite entry
+13 Save roster
+14 Send invite notification
+15 Show roster
+16 Validation errors
+endlegend
+
+@enduml

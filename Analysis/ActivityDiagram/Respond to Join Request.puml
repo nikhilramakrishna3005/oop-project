@@ -1,0 +1,54 @@
+@startuml
+title MicroMeet - Activity Diagram (Respond to Join Request - Accept/Decline)
+
+start
+:1. User opens Join Request response screen;
+:2. User selects Accept or Decline;
+:3. User submits response;
+:4. System validates response;
+
+if (Response valid?) then (Yes)
+  :5. System loads meetup;
+  if (Choice = Accept?) then (Yes)
+    :6. System checks capacity;
+    if (Capacity available?) then (Yes)
+      :7. System sets participation status = ACCEPTED;
+      :8. System saves updated meetup/roster;
+      :9. System notifies host and user;
+      :10. Show updated status;
+    else (No)
+      :11. Show "Meetup full" error;
+    endif
+  else (Decline)
+    :12. System sets participation status = DECLINED;
+    :13. System saves updated meetup/roster;
+    :14. System notifies host;
+    :15. Show updated status;
+  endif
+else (No)
+  :16. Show validation errors;
+endif
+
+stop
+
+legend bottom
+Steps mapping (numbers match actions):
+1 Open join response screen
+2 Choose accept/decline
+3 Submit response
+4 Validate response
+5 Load meetup
+6 Check capacity (accept)
+7 Set status accepted
+8 Save roster
+9 Notify host/user
+10 Show updated status
+11 Meetup full error
+12 Set status declined
+13 Save roster
+14 Notify host
+15 Show updated status
+16 Validation errors
+endlegend
+
+@enduml

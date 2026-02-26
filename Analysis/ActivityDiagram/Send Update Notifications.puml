@@ -1,0 +1,38 @@
+@startuml
+title MicroMeet - Activity Diagram (Send Update Notifications)
+
+start
+:1. Scheduler triggers notification job;
+:2. System starts notification processing;
+:3. System finds meetups with updates;
+
+if (Any updated meetups?) then (Yes)
+  :4. For each updated meetup, gather recipients;
+  :5. Read participant list;
+  :6. Compose notification message;
+  :7. Deliver notification via gateway;
+  :8. Record success/failure;
+  :9. Count sent notifications;
+  :10. Log job result (sentCount);
+else (No)
+  :11. Log "No updates to notify";
+endif
+
+stop
+
+legend bottom
+Steps mapping (numbers match actions):
+1 Trigger scheduler job
+2 Start processing
+3 Find updated meetups
+4 Gather recipients (loop)
+5 Read participant list
+6 Compose notification
+7 Deliver via gateway
+8 Record result
+9 Count sent notifications
+10 Log job result
+11 Log no-updates case
+endlegend
+
+@enduml
