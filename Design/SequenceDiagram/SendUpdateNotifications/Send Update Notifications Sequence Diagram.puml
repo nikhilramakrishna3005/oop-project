@@ -1,0 +1,34 @@
+@startuml
+title Sequence Diagram - Send Update Notifications
+skinparam shadowing false
+skinparam linetype ortho
+
+actor Scheduler as "System Scheduler"
+boundary SchedulerTrigger
+control NotificationController
+control NotificationService
+database MeetupRepository
+entity Meetup
+entity Participation
+entity Notification
+entity NotificationGateway as "NotificationGateway <<external>>"
+
+Scheduler -> SchedulerTrigger : triggerJob()
+SchedulerTrigger -> NotificationController : runNotifications()
+
+NotificationController -> NotificationService : processPendingUpdates()
+
+NotificationService -> MeetupRepository : listMeetupsWithChanges()
+MeetupRepository --> NotificationService : meetups(List<Meetup>)
+
+loop for each meetup with changes
+  NotificationService -> Meetup : gatherRecipients(meetupId)
+  NotificationService -> Participation : readParticipants(meetupId)
+  NotificationService -> Notification : compose(meetupId, recipients)
+  NotificationService -> NotificationGateway : deliver(notification)
+end
+
+NotificationService --> NotificationController : sentCount(count)
+NotificationController --> SchedulerTrigger : logResult(count)
+
+@enduml
