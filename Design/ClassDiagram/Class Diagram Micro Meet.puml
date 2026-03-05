@@ -1,0 +1,173 @@
+@startuml
+title MicroMeet - Class Diagram (Clean Version)
+
+left to right direction
+skinparam shadowing false
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+hide circle
+
+'=====================
+' Entities
+'=====================
+class User {
+  +userId: String
+  +name: String
+  +email: String
+  +availability: AvailabilityStatus
+  --
+  +verifyPassword(password: String): boolean
+  +updateProfile(name: String, email: String): void
+}
+
+class Credentials {
+  +username: String
+  +passwordHash: String
+  --
+  +validateFormat(username: String, password: String): boolean
+  +matches(password: String): boolean
+}
+
+class Preference {
+  +preferenceId: String
+  +key: String
+  +value: String
+  --
+  +updateValue(value: String): void
+}
+
+class Meetup {
+  +meetupId: String
+  +title: String
+  +activityType: ActivityType
+  +time: DateTime
+  +capacity: int
+  +description: String
+  --
+  +applyUpdates(updates: Map): void
+  +isFull(): boolean
+  +gatherRecipients(): List<User>
+}
+
+class Location {
+  +locationId: String
+  +label: String
+  +latitude: double
+  +longitude: double
+  --
+  +updateFrom(data: Map): void
+}
+
+class Participation {
+  +participationId: String
+  +status: ParticipationStatus
+  +joinedAt: DateTime
+  --
+  +setStatus(choice: String): void
+}
+
+class Notification {
+  +notificationId: String
+  +type: String
+  +message: String
+  +createdAt: DateTime
+  --
+  +compose(type: String, message: String): void
+}
+
+'=====================
+' Enums (correct syntax)
+'=====================
+enum AvailabilityStatus {
+  ONLINE
+  OFFLINE
+}
+
+enum ParticipationStatus {
+  REQUESTED
+  ACCEPTED
+  DECLINED
+}
+
+enum ActivityType {
+  STUDY
+  GYM
+  FOOD
+  SPORTS
+  COFFEE
+}
+
+'=====================
+' Repositories / External
+'=====================
+class UserRepository {
+  +findUser(username: String): User
+  +loadUser(userId: String): User
+  +saveUser(user: User): void
+}
+
+class MeetupRepository {
+  +listMeetups(filters: Map): List<Meetup>
+  +loadMeetup(meetupId: String): Meetup
+  +saveMeetup(meetup: Meetup): void
+  +listMeetupsWithChanges(): List<Meetup>
+}
+
+class NotificationGateway {
+  +deliver(notification: Notification): boolean
+}
+
+'=====================
+' Services (methods match sequence diagrams)
+'=====================
+class AuthService {
+  +authenticate(credentials: Credentials): boolean
+}
+
+class ProfileService {
+  +updateProfile(userId: String, changes: Map): User
+}
+
+class MeetupService {
+  +getActiveUpcoming(filters: Map): List<Meetup>
+  +getMeetupDetails(meetupId: String): Map
+  +createMeetup(hostId: String, details: Map, locationData: Map): Meetup
+  +editMeetup(meetupId: String, updates: Map): Meetup
+  +manageParticipants(meetupId: String, userId: String, action: String): Map
+  +updateParticipation(meetupId: String, userId: String, choice: String): Meetup
+}
+
+class NotificationService {
+  +notifyParticipants(meetupId: String, message: String): void
+  +sendInviteOrApproval(userId: String, action: String): void
+  +notifyHostOrUser(meetupId: String, userId: String, choice: String): void
+  +processPendingUpdates(): int
+}
+
+'=====================
+' Associations
+'=====================
+User "1" -- "1" Credentials : usesCredentials
+User "1" -- "0..*" Preference : hasPreferences
+
+User "1" -- "0..*" Meetup : hosts
+Meetup "1" -- "1" Location : occursAt
+
+Meetup "1" -- "0..*" Participation : hasParticipants
+User "1" -- "0..*" Participation : participates
+
+Meetup "1" -- "0..*" Notification : triggers
+
+Notification "0..*" ..> NotificationGateway : deliveredVia
+
+'=====================
+' Dependencies (service -> repository/gateway)
+'=====================
+AuthService ..> UserRepository : findUser()
+ProfileService ..> UserRepository : loadUser()/saveUser()
+
+MeetupService ..> MeetupRepository : list/load/save
+NotificationService ..> MeetupRepository : listMeetupsWithChanges()
+NotificationService ..> NotificationGateway : deliver()
+
+@enduml
