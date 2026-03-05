@@ -1,0 +1,46 @@
+@startuml
+title Sequence Diagram - Invite / Approve Participants
+skinparam shadowing false
+skinparam linetype ortho
+
+actor HostActor as "Host"
+boundary ManageParticipantsView
+control MeetupController
+control MeetupService
+control NotificationService
+database MeetupRepository
+entity Meetup
+entity User
+entity Participation
+
+HostActor -> ManageParticipantsView : chooseInviteOrApprove()
+ManageParticipantsView -> MeetupController : inviteOrApprove(meetupId, userId, action)
+
+MeetupController -> MeetupService : manageParticipants(meetupId, userId, action)
+
+MeetupService -> MeetupRepository : loadMeetup(meetupId)
+MeetupRepository --> MeetupService : meetup(Meetup)
+
+alt action == "APPROVE"
+  MeetupService -> Meetup : checkCapacity()
+  alt capacityFull == true
+    MeetupService --> MeetupController : failure("Capacity full")
+    MeetupController --> ManageParticipantsView : showError("Capacity full")
+  else capacityFull == false
+    MeetupService -> User : validateTargetUser(userId)
+    MeetupService -> Participation : createOrUpdate(meetupId, userId, action)
+    MeetupService -> MeetupRepository : saveMeetup(meetup)
+    MeetupService -> NotificationService : sendInviteOrApproval(userId, action)
+    MeetupService --> MeetupController : updatedRoster(roster)
+    MeetupController --> ManageParticipantsView : showRoster(roster)
+  end
+else action == "INVITE"
+  MeetupService -> User : validateTargetUser(userId)
+  MeetupService -> Participation : createOrUpdate(meetupId, userId, action)
+  MeetupService -> MeetupRepository : saveMeetup(meetup)
+  MeetupService -> NotificationService : sendInviteOrApproval(userId, action)
+  MeetupService --> MeetupController : updatedRoster(roster)
+  MeetupController --> ManageParticipantsView : showRoster(roster)
+end
+
+@enduml
