@@ -1,0 +1,43 @@
+@startuml
+title Sequence Diagram - Respond to Join Request (Accept/Decline)
+skinparam shadowing false
+skinparam linetype ortho
+
+actor UserActor as "User"
+boundary JoinResponseView
+control MeetupController
+control MeetupService
+control NotificationService
+database MeetupRepository
+entity Meetup
+entity Participation
+
+UserActor -> JoinResponseView : chooseAcceptOrDecline()
+JoinResponseView -> MeetupController : submitResponse(meetupId, userId, choice)
+
+MeetupController -> MeetupService : updateParticipation(meetupId, userId, choice)
+
+MeetupService -> MeetupRepository : loadMeetup(meetupId)
+MeetupRepository --> MeetupService : meetup(Meetup)
+
+alt choice == "ACCEPT"
+  MeetupService -> Meetup : checkCapacity()
+  alt capacityFull == true
+    MeetupService --> MeetupController : failure("Capacity full")
+    MeetupController --> JoinResponseView : showError("Capacity full")
+  else capacityFull == false
+    MeetupService -> Participation : setStatus(meetupId, userId, choice)
+    MeetupService -> MeetupRepository : saveMeetup(meetup)
+    MeetupService -> NotificationService : notifyHostOrUser(meetupId, userId, choice)
+    MeetupService --> MeetupController : updatedMeetup(meetup)
+    MeetupController --> JoinResponseView : showUpdatedStatus(meetup)
+  end
+else choice == "DECLINE"
+  MeetupService -> Participation : setStatus(meetupId, userId, choice)
+  MeetupService -> MeetupRepository : saveMeetup(meetup)
+  MeetupService -> NotificationService : notifyHostOrUser(meetupId, userId, choice)
+  MeetupService --> MeetupController : updatedMeetup(meetup)
+  MeetupController --> JoinResponseView : showUpdatedStatus(meetup)
+end
+
+@enduml
