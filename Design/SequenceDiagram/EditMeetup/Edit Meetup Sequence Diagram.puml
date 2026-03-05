@@ -1,0 +1,35 @@
+@startuml
+title Sequence Diagram - Edit Meetup
+skinparam shadowing false
+skinparam linetype ortho
+
+actor HostActor as "Host"
+boundary EditMeetupView
+control MeetupController
+control MeetupService
+control NotificationService
+database MeetupRepository
+entity Meetup
+entity Location
+
+HostActor -> EditMeetupView : editFields()
+EditMeetupView -> MeetupController : submitEdits(meetupId, updates)
+
+MeetupController -> MeetupService : editMeetup(meetupId, updates)
+
+MeetupService -> MeetupRepository : loadMeetup(meetupId)
+MeetupRepository --> MeetupService : meetup(Meetup)
+
+MeetupService -> Meetup : applyUpdates(updates)
+
+opt Location changed
+  MeetupService -> Location : updateLocationIfNeeded(meetupId, updates)
+end
+
+MeetupService -> MeetupRepository : saveMeetup(meetup)
+MeetupService -> NotificationService : notifyParticipants(meetupId, "Meetup updated")
+
+MeetupService --> MeetupController : updatedMeetup(meetup)
+MeetupController --> EditMeetupView : showUpdatedDetails(meetup)
+
+@enduml
